@@ -1,86 +1,86 @@
-# Rime Input Habit Logger
+# Rime 输入习惯记录器
 
-This project provides a Lua script and a Python-based command-line tool to install and manage a data logger for the [Rime Input Method Engine](https://rime.im/). It is designed to capture detailed information about your typing habits, saving it to a structured JSONL file for later analysis.
+该项目提供了一个 Lua 脚本和一个基于 Python 的命令行工具，用于安装和管理 [Rime 输入法引擎](https://rime.im/) 的数据记录器。它旨在捕获有关您打字习惯的详细信息，并将其保存到结构化的 JSONL 文件中，以便后续分析。
 
-The primary goal is to gather data that can be used to analyze typing efficiency, identify common errors, and potentially fine-tune your Rime schema for a better, more personalized input experience.
+主要目标是收集可用于分析打字效率、识别常见错误以及可能微调您的 Rime 输入方案以获得更好、更个性化输入体验的数据。
 
-## Features
+## 功能特性
 
-- **Detailed Event Logging:** Captures keypresses, candidate lists, and final text selections.
-- **Rich Context:** Records *how* you select a word (space vs. number key) and the rank of your chosen candidate.
-- **Configurable:** You have full control over what gets logged via a simple Lua configuration file.
-- **Cross-Platform:** The installer automatically detects the Rime user directory on Windows, macOS, and Linux.
-- **Easy Management:** A simple command-line interface (`rime-logger`) to install, uninstall, and check the status of the logger.
-- **Ready for Analysis:** Outputs structured JSONL data, perfect for processing with tools like Python's Pandas library.
+-   **详细事件记录:** 捕获按键、候选词列表和最终文本选择。
+-   **丰富上下文:** 记录您*如何*选择一个词（空格键或数字键）以及所选候选词的排名。
+-   **可配置:** 您可以通过简单的 Lua 配置文件完全控制记录内容。
+-   **跨平台:** 安装程序会自动检测 Windows、macOS 和 Linux 上的 Rime 用户目录。
+-   **易于管理:** 一个简单的命令行界面 (`rime-logger`) 用于安装、卸载和检查记录器的状态。
+-   **便于分析:** 输出结构化的 JSONL 数据，非常适合使用 Python 的 Pandas 库等工具进行处理。
 
-## Installation
+## 安装
 
-You will need Python 3.7+ installed on your system.
+您需要系统上安装 Python 3.7+。
 
-1.  Clone this repository or download the source code:
+1.  克隆此仓库或下载源代码:
     ```bash
     git clone https://github.com/your-username/rime-wanxiang-logger.git
     cd rime-wanxiang-logger
     ```
 
-2.  Install the package using pip. This will install the necessary files and make the `rime-logger` command available system-wide.
+2.  使用 pip 安装此软件包。这将安装必要的文件并使 `rime-logger` 命令在系统范围内可用。
     ```bash
     pip install .
     ```
 
-## Usage
+## 使用方法
 
-The installer provides a single command-line tool, `rime-logger`, to manage the installation.
+安装程序提供了一个单独的命令行工具 `rime-logger` 来管理安装。
 
-**IMPORTANT:** After running `install` or `uninstall`, you **must** re-deploy Rime for the changes to take effect. You can usually do this by clicking the Rime icon in your system's menu/taskbar and selecting "Deploy" (部署).
+**重要提示:** 运行 `install` 或 `uninstall` 后，您**必须**重新部署 Rime 才能使更改生效。您通常可以通过单击系统菜单/任务栏中的 Rime 图标并选择“部署”来完成此操作。
 
-### To Install the Logger
+### 安装记录器
 
-This command now starts an interactive session, allowing you to choose a logging preset directly from the command line.
+此命令现在会启动一个交互式会话，允许您直接从命令行选择日志记录预设。
 
 ```bash
 rime-logger install
 ```
 
-You will be prompted to select a mode like "Normal", "Developer", or "Advanced".
+您将看到一个选择模式的提示，例如“普通”、“开发者”或“高级”。
 
-### To Analyze Your Typing Habits
+### 分析您的打字习惯
 
-The `analyze` command reads your log file and provides a statistical summary of your typing accuracy, including first-choice accuracy, top-3 accuracy, and an overall prediction score.
+`analyze` 命令会读取您的日志文件，并提供您打字准确性的统计摘要，包括首选命中率、前三候选命中率和整体预测得分。
 
 ```bash
 rime-logger analyze
 ```
 
-### To Export Data for Developers
+### 导出开发者数据
 
-If you want to help improve the input schema, you can use the `export-misses` command. It creates a `rime_mispredictions_report.csv` file in your home directory, containing all instances where you didn't choose the first candidate. This file can be easily shared with developers.
+如果您想帮助改进输入方案，可以使用 `export-misses` 命令。它会在您的用户主目录中创建一个名为 `rime_mispredictions_report.csv` 的文件，其中包含所有您未选择首选候选词的情况。此文件可以轻松与开发者共享。
 
 ```bash
 rime-logger export-misses
 ```
 
-### To Uninstall the Logger
+### 卸载记录器
 
-This will remove the logger from your schema file and delete the main Lua script. It will leave the configuration file untouched to preserve your settings.
+这将从您的输入方案文件中删除记录器并删除主 Lua 脚本。它将保留配置文件不变，以保留您的设置。
 
 ```bash
 rime-logger uninstall
 ```
 
-### To Check the Status
+### 检查状态
 
-This will report whether the necessary files are in place and if the schema is configured correctly.
+这将报告必要文件是否到位以及输入方案是否配置正确。
 
 ```bash
 rime-logger status
 ```
 
-## Configuration
+## 配置
 
-When you install the logger, a configuration file named `input_habit_logger_config.lua` is created in your Rime `lua` directory. You can edit this file to control what data is logged.
+当您安装记录器时，会在您的 Rime `lua` 目录中创建一个名为 `input_habit_logger_config.lua` 的配置文件。您可以编辑此文件来控制记录哪些数据。
 
-Example `input_habit_logger_config.lua`:
+`input_habit_logger_config.lua` 示例:
 ```lua
 return {
   -- Master switch. If false, no logging will occur.
@@ -102,23 +102,25 @@ return {
 }
 ```
 
-## The Log File
+## 日志文件
 
-The logger will create a file named `input_habit_log_structured.jsonl` in your main Rime user directory. Each line in this file is a separate JSON object representing a single event.
+记录器将在您的主要 Rime 用户目录中创建一个名为 `input_habit_log_structured.jsonl` 的文件。此文件中的每一行都是一个独立的 JSON 对象，表示一个事件。
 
-This format is ideal for processing with data analysis tools. You can easily load it into a Pandas DataFrame in Python, for example:
+此格式非常适合使用数据分析工具进行处理。例如，您可以轻松将其加载到 Python 的 Pandas DataFrame 中：
 
 ```python
 import pandas as pd
 
-# The log file is typically in the root of the Rime user directory
+# 日志文件通常位于 Rime 用户目录的根目录
 log_file_path = 'path/to/your/Rime/input_habit_log_structured.jsonl'
 df = pd.read_json(log_file_path, lines=True)
 
-# Start your analysis!
+# 开始您的分析！
 print(df.info())
 ```
 
-## License
+## 许可证
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+本项目采用 MIT 许可证。有关详细信息，请参阅 `LICENSE` 文件。
+```
+</output>

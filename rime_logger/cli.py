@@ -101,69 +101,69 @@ class RimeManager:
         return default_path
 
     def check_status(self):
-        """Checks and reports the current installation status of the logger."""
-        click.echo("--- Rime Logger Status ---")
+        """检查并报告当前日志记录器的安装状态。"""
+        click.echo("--- Rime 日志记录器状态检查 ---")
         if not self.rime_user_dir:
-            click.secho("❌ Rime user directory not found. Is Rime installed?", fg="red")
+            click.secho("❌ 未找到 Rime 用户目录。请问 Rime 是否已安装？", fg="red")
             return
 
-        click.secho(f"✅ Rime user directory found: {self.rime_user_dir}", fg="green")
+        click.secho(f"✅ 找到 Rime 用户目录: {self.rime_user_dir}", fg="green")
 
-        # Check for Lua files
+        # 检查 Lua 脚本文件
         for file_name in [LOGGER_LUA_FILE, CONFIG_LUA_FILE]:
             path = self.rime_lua_dir / file_name
             if path.exists():
-                click.secho(f"✅ Found script: {path}", fg="green")
+                click.secho(f"✅ 找到脚本: {path}", fg="green")
             else:
-                click.secho(f"❌ Not found: {path}", fg="red")
+                click.secho(f"❌ 未找到脚本: {path}", fg="red")
 
-        # Check schema configuration
+        # 检查输入方案配置
         schema_path = self.rime_user_dir / SCHEMA_YAML_FILE
         if not schema_path.exists():
-            click.secho(f"❌ Schema file not found: {schema_path}", fg="red")
+            click.secho(f"❌ 未找到输入方案文件: {schema_path}", fg="red")
         else:
             try:
                 with open(schema_path, 'r', encoding='utf-8') as f:
                     content = f.read()
                 if LINE_TO_ADD_IN_SCHEMA.strip() in content:
-                    click.secho(f"✅ Schema '{SCHEMA_YAML_FILE}' is configured for logger.", fg="green")
+                    click.secho(f"✅ 输入方案 '{SCHEMA_YAML_FILE}' 已为日志记录器正确配置。", fg="green")
                 else:
-                    click.secho(f"❌ Schema '{SCHEMA_YAML_FILE}' is not configured.", fg="yellow")
+                    click.secho(f"❌ 输入方案 '{SCHEMA_YAML_FILE}'尚未配置。", fg="yellow")
             except Exception as e:
-                click.secho(f"❓ Could not read schema file. Error: {e}", fg="yellow")
+                click.secho(f"❓ 无法读取输入方案文件。错误: {e}", fg="yellow")
 
         if self.log_file_path and self.log_file_path.exists():
-            click.secho(f"✅ Log file found: {self.log_file_path}", fg="green")
+            click.secho(f"✅ 找到日志文件: {self.log_file_path}", fg="green")
         else:
-            click.secho(f"❌ Log file not found at '{self.log_file_path}'. Type something to generate it.", fg="yellow")
+            click.secho(f"❌ 在 '{self.log_file_path}' 未找到日志文件。请打字以生成日志。", fg="yellow")
 
 
     def install(self, preset: str):
-        """Installs the logger scripts and modifies the schema."""
-        click.echo("--- Starting Logger Installation ---")
+        """安装日志记录器脚本并修改输入方案。"""
+        click.echo("--- 开始安装日志记录器 ---")
         if not self.rime_user_dir:
-            click.secho("❌ ERROR: Rime user directory not found. Cannot install.", fg="red")
+            click.secho("❌ 错误: 未找到 Rime 用户目录，无法安装。", fg="red")
             sys.exit(1)
 
-        click.echo(f"Found Rime directory: {self.rime_user_dir}")
+        click.echo(f"找到 Rime 目录: {self.rime_user_dir}")
 
-        # Step 1: Install Lua scripts with selected preset
-        click.echo("\n--> Step 1: Copying Lua scripts...")
+        # 步骤 1: 根据选择的预设安装 Lua 脚本
+        click.echo("\n--> 步骤 1: 复制 Lua 脚本...")
         self.rime_lua_dir.mkdir(exist_ok=True)
 
         src_logger = self.assets_dir / LOGGER_LUA_FILE
         dest_logger = self.rime_lua_dir / LOGGER_LUA_FILE
         shutil.copy(src_logger, dest_logger)
-        click.echo(f"    [+] Installed: {dest_logger}")
+        click.echo(f"    [+] 已安装: {dest_logger}")
 
-        # Modify and install config file
+        # 修改并安装配置文件
         src_config_path = self.assets_dir / CONFIG_LUA_FILE
         dest_config_path = self.rime_lua_dir / CONFIG_LUA_FILE
 
         with open(src_config_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # Replace the preset value
+        # 替换预设值
         new_content = re.sub(
             r'local preset_choice\s*=\s*".*"',
             f'local preset_choice = "{preset}"',
@@ -172,27 +172,27 @@ class RimeManager:
 
         with open(dest_config_path, 'w', encoding='utf-8') as f:
             f.write(new_content)
-        click.echo(f"    [+] Installed config with '{preset}' preset: {dest_config_path}")
+        click.echo(f"    [+] 已安装配置文件，预设为 '{preset}': {dest_config_path}")
 
-        # Step 2: Modify schema file
-        click.echo("\n--> Step 2: Modifying schema file...")
+        # 步骤 2: 修改输入方案文件
+        click.echo("\n--> 步骤 2: 修改输入方案文件...")
         self._modify_schema_for_install()
 
-        click.secho("\n--- ✅ Installation successful! ---", fg="green", bold=True)
-        click.secho("\nIMPORTANT: You must 'Re-deploy' Rime now for changes to take effect.", fg="yellow")
+        click.secho("\n--- ✅ 安装成功！ ---", fg="green", bold=True)
+        click.secho("\n重要提示: 您必须立即“重新部署”Rime才能使更改生效。", fg="yellow")
 
     def _modify_schema_for_install(self):
-        """Helper to encapsulate schema modification during installation."""
+        """封装安装过程中的输入方案修改操作。"""
         schema_file = self.rime_user_dir / SCHEMA_YAML_FILE
         if not schema_file.exists():
-            click.secho(f"    ❌ ERROR: '{schema_file}' not found.", fg="red")
-            click.echo("    Please ensure the Wanxiang schema is installed and deploy Rime once.")
+            click.secho(f"    ❌ 错误: 未找到 '{schema_file}'。", fg="red")
+            click.echo("    请确保已安装“万象”输入方案并已至少部署过一次。")
             sys.exit(1)
 
         try:
             with open(schema_file, 'r', encoding='utf-8') as f: lines = f.readlines()
             if any(LINE_TO_ADD_IN_SCHEMA.strip() in line for line in lines):
-                click.echo("    [*] Schema already configured. No changes needed.")
+                click.echo("    [*] 输入方案已配置，无需更改。")
                 return
 
             punctuator_index = -1
@@ -202,7 +202,7 @@ class RimeManager:
                     break
 
             if punctuator_index == -1:
-                click.secho("    ❌ ERROR: Could not find 'punctuator' entry in schema.", fg="red")
+                click.secho("    ❌ 错误: 在输入方案中未找到 'punctuator' 入口。", fg="red")
                 sys.exit(1)
 
             indentation = lines[punctuator_index][:lines[punctuator_index].find('-')]
@@ -211,47 +211,47 @@ class RimeManager:
 
             backup_file = schema_file.with_suffix('.yaml.bak')
             shutil.copy(schema_file, backup_file)
-            click.echo(f"    [*] Backed up original schema to: {backup_file}")
+            click.echo(f"    [*] 已将原始输入方案备份至: {backup_file}")
 
             with open(schema_file, 'w', encoding='utf-8') as f: f.writelines(lines)
-            click.secho(f"    [+] Successfully configured '{SCHEMA_YAML_FILE}'.", fg="green")
+            click.secho(f"    [+] 已成功配置 '{SCHEMA_YAML_FILE}'。", fg="green")
         except Exception as e:
-            click.secho(f"    ❌ An unexpected error occurred: {e}", fg="red")
+            click.secho(f"    ❌ 发生意外错误: {e}", fg="red")
             sys.exit(1)
 
 
     def uninstall(self):
-        """Removes the logger components."""
-        click.echo("--- Starting Logger Uninstallation ---")
+        """卸载日志记录器组件。"""
+        click.echo("--- 开始卸载日志记录器 ---")
         if not self.rime_user_dir:
-            click.secho("❌ ERROR: Rime user directory not found.", fg="red")
+            click.secho("❌ 错误: 未找到 Rime 用户目录。", fg="red")
             sys.exit(1)
 
-        # Remove Lua scripts
-        click.echo("\n--> Step 1: Removing Lua scripts...")
+        # 移除 Lua 脚本
+        click.echo("\n--> 步骤 1: 移除 Lua 脚本...")
         logger_path = self.rime_lua_dir / LOGGER_LUA_FILE
         if logger_path.exists():
             logger_path.unlink()
-            click.echo(f"    [-] Removed: {logger_path}")
+            click.echo(f"    [-] 已移除: {logger_path}")
 
-        if click.confirm(f"    Do you want to remove the config file '{CONFIG_LUA_FILE}' as well?"):
+        if click.confirm(f"    您是否也想移除配置文件 '{CONFIG_LUA_FILE}'？"):
              config_path = self.rime_lua_dir / CONFIG_LUA_FILE
              if config_path.exists():
                 config_path.unlink()
-                click.echo(f"    [-] Removed: {config_path}")
+                click.echo(f"    [-] 已移除: {config_path}")
 
-        # Revert schema file
-        click.echo("\n--> Step 2: Reverting schema file...")
+        # 恢复输入方案文件
+        click.echo("\n--> 步骤 2: 恢复输入方案文件...")
         self._revert_schema_for_uninstall()
 
-        click.secho("\n--- ✅ Uninstallation successful! ---", fg="green", bold=True)
-        click.secho("\nIMPORTANT: You must 'Re-deploy' Rime now for changes to take effect.", fg="yellow")
+        click.secho("\n--- ✅ 卸载成功！ ---", fg="green", bold=True)
+        click.secho("\n重要提示: 您必须立即“重新部署”Rime才能使更改生效。", bold=True, fg="yellow")
 
     def _revert_schema_for_uninstall(self):
-        """Helper to encapsulate schema modification during uninstallation."""
+        """封装卸载过程中的输入方案修改操作。"""
         schema_file = self.rime_user_dir / SCHEMA_YAML_FILE
         if not schema_file.exists():
-            click.echo("    [*] Schema file not found, skipping.")
+            click.echo("    [*] 未找到输入方案文件，跳过。")
             return
         try:
             with open(schema_file, 'r', encoding='utf-8') as f: lines = f.readlines()
@@ -259,17 +259,17 @@ class RimeManager:
 
             if len(lines) != len(lines_to_keep):
                 with open(schema_file, 'w', encoding='utf-8') as f: f.writelines(lines_to_keep)
-                click.secho(f"    [+] Removed logger configuration from '{SCHEMA_YAML_FILE}'.", fg="green")
+                click.secho(f"    [+] 已从 '{SCHEMA_YAML_FILE}' 中移除日志记录器配置。", fg="green")
             else:
-                click.echo("    [*] Logger configuration not found in schema. No changes needed.")
+                click.echo("    [*] 在输入方案中未找到日志记录器配置，无需更改。")
         except Exception as e:
-             click.secho(f"    ❌ An unexpected error occurred: {e}", fg="red")
+             click.secho(f"    ❌ 发生意外错误: {e}", fg="red")
 
     def analyze(self):
-        """Analyzes the collected log data."""
-        click.echo("--- Analyzing Typing Data ---")
+        """分析收集到的日志数据。"""
+        click.echo("--- 输入习惯分析 ---")
         if not self.log_file_path or not self.log_file_path.exists():
-            click.secho(f"❌ Log file not found at: {self.log_file_path}", fg="red")
+            click.secho(f"❌ 未找到日志文件: {self.log_file_path}", fg="red")
             return
 
         try:
@@ -277,15 +277,15 @@ class RimeManager:
             df_commit = df[df['event_type'] == 'text_committed'].copy()
 
             if df_commit.empty:
-                click.secho("No 'text_committed' events found in the log file.", fg="yellow")
+                click.secho("日志文件中未找到“text_committed”事件。", fg="yellow")
                 return
 
-            # --- Accuracy Metrics ---
-            click.secho("\n## Prediction Accuracy Metrics", bold=True)
+            # --- 准确度指标 ---
+            click.secho("\n## 预测准确度指标", bold=True)
             df_selections = df_commit[df_commit['selected_candidate_rank'] >= 0].copy()
 
             if df_selections.empty:
-                 click.secho("No valid candidate selections found to analyze.", fg="yellow")
+                 click.secho("未找到可供分析的有效候选词选择。", fg="yellow")
             else:
                 total_selections = len(df_selections)
                 first_choice_count = (df_selections['selected_candidate_rank'] == 0).sum()
@@ -293,69 +293,70 @@ class RimeManager:
                 df_selections['accuracy_score'] = 1 / (df_selections['selected_candidate_rank'] + 1)
                 overall_accuracy_score = df_selections['accuracy_score'].mean()
 
-                click.echo(f"  - Total Candidate Selections: {total_selections}")
-                click.echo(f"  - First-Choice Accuracy:      {first_choice_count / total_selections:.2%}")
-                click.echo(f"  - Top-3 Accuracy:             {top_3_count / total_selections:.2%}")
-                click.echo(f"  - Average Candidate Rank:     {df_selections['selected_candidate_rank'].mean():.2f}")
-                click.secho(f"  - Overall Prediction Score:   {overall_accuracy_score:.3f} / 1.000", fg="green")
+                click.echo(f"  - 总候选词选择数: {total_selections}")
+                click.echo(f"  - 首选命中率:      {first_choice_count / total_selections:.2%}")
+                click.echo(f"  - 前三候选命中率:   {top_3_count / total_selections:.2%}")
+                click.echo(f"  - 平均选择排名:     {df_selections['selected_candidate_rank'].mean():.2f}")
+                click.secho(f"  - 综合预测得分:   {overall_accuracy_score:.3f} / 1.000", fg="green")
 
-            # --- Other Stats ---
-            click.secho("\n## General Statistics", bold=True)
+            # --- 其他统计 ---
+            click.secho("\n## 常规统计", bold=True)
             total_commits = len(df_commit)
             raw_input_commits = (df_commit['selected_candidate_rank'] == -1).sum()
 
-            click.echo(f"  - Total Commits (incl. raw): {total_commits}")
+            click.echo(f"  - 总上屏次数 (包括直接上屏): {total_commits}")
             if total_commits > 0:
-                click.echo(f"  - Raw Input Rate (non-candidate): {raw_input_commits / total_commits:.2%}")
+                click.echo(f"  - 直接上屏率 (非候选词): {raw_input_commits / total_commits:.2%}")
 
         except Exception as e:
-            click.secho(f"❌ An error occurred during analysis: {e}", fg="red")
+            click.secho(f"❌ 分析过程中发生错误: {e}", fg="red")
+
 
     def export_misses(self):
-        """Exports mis-prediction data to a CSV file."""
-        click.echo("--- Exporting Mis-prediction Report ---")
+        """将预测错误数据导出到CSV文件。"""
+        click.echo("--- 导出预测错误报告 ---")
         if not self.log_file_path or not self.log_file_path.exists():
-            click.secho(f"❌ Log file not found at: {self.log_file_path}", fg="red")
+            click.secho(f"❌ 未找到日志文件: {self.log_file_path}", fg="red")
             return
 
         try:
             df = pd.read_json(self.log_file_path, lines=True)
             df_commit = df[df['event_type'] == 'text_committed'].copy()
 
-            # Filter for misses (rank > 0)
+            # 筛选错误记录 (rank > 0)
             df_misses = df_commit[df_commit['selected_candidate_rank'] > 0].copy()
 
             if df_misses.empty:
-                click.secho("✅ No mis-predictions found (selected_candidate_rank > 0). Great job!", fg="green")
+                click.secho("✅ 未发现预测错误 (selected_candidate_rank > 0)。做得好！", fg="green")
                 return
 
-            # Select and rename columns for clarity
+            # 为清晰起见，选择并重命名列
             report_cols = {
-                'source_input_buffer': 'User_Input',
-                'committed_text': 'Selected_Text',
-                'source_first_candidate': 'Predicted_Text',
-                'selected_candidate_rank': 'Selected_Rank'
+                'source_input_buffer': '用户输入',
+                'committed_text': '实际选择',
+                'source_first_candidate': '程序预测',
+                'selected_candidate_rank': '选择排名'
             }
-            # Ensure all columns exist before trying to select them
+            # 确保在尝试选择列之前所有列都存在
             cols_to_select = [col for col in report_cols.keys() if col in df_misses.columns]
             df_report = df_misses[cols_to_select].rename(columns=report_cols)
 
 
-            # Calculate frequency of each mistake and sort by it
-            if 'Selected_Text' in df_report.columns:
-                df_report['miss_frequency'] = df_report.groupby('Selected_Text')['Selected_Text'].transform('count')
-                df_report.sort_values(by=['miss_frequency', 'User_Input'], ascending=[False, True], inplace=True)
+            # 计算每个错误的频率并据此排序
+            if '实际选择' in df_report.columns:
+                df_report['错误频率'] = df_report.groupby('实际选择')['实际选择'].transform('count')
+                df_report.sort_values(by=['错误频率', '用户输入'], ascending=[False, True], inplace=True)
 
-            # Export to CSV
+            # 导出到 CSV
             export_path = Path.home() / "rime_mispredictions_report.csv"
             df_report.to_csv(export_path, index=False, encoding='utf-8-sig')
 
-            click.secho(f"✅ Successfully exported {len(df_report)} mis-predictions.", fg="green")
-            click.echo("The most common mistakes are at the top of the file.")
-            click.echo(f"Report saved to: {export_path}")
+            click.secho(f"✅ 成功导出 {len(df_report)} 条预测错误记录。", fg="green")
+            click.echo("最常见的错误位于文件顶部。")
+            click.echo(f"报告已保存至: {export_path}")
 
         except Exception as e:
-            click.secho(f"❌ An error occurred during export: {e}", fg="red")
+            click.secho(f"❌ 导出过程中发生错误: {e}", fg="red")
 
 # --- CLI using Click ---
 @click.group(context_settings=dict(help_option_names=['-h', '--help']))
@@ -369,8 +370,8 @@ def main(ctx):
 def install(ctx):
     """Install the logger with an interactive preset selection."""
     preset_map = {
-        "✅ 普通模式 (Normal) - 推荐，用于计算基本打字准确率": "normal",
-        "👩‍💻 开发者模式 (Developer) - 用于调试，关注非首选上屏": "developer",
+        "✅ 普通模式 (Normal) - 推荐，用于计算输入法预测准确率": "normal",
+        "👩‍💻 词库贡献者模式 (Developer) - 用于调试，关注非首选上屏": "developer",
         "🔬 高级模式 (Advanced) - 记录几乎所有信息，用于深度分析": "advanced",
         "⚙️ 自定义 (Custom) - (需要手动修改配置文件)": "custom"
     }
