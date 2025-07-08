@@ -22,6 +22,11 @@ setup(
     package_data={
         'rime_logger': ['assets/*.lua'],
     },
+    install_requires=[
+        'pandas',
+        'click',
+        'questionary', # A good library for the interactive prompts
+    ],
     include_package_data=True,
     # This creates the command-line script.
     # When the user installs the package, a command 'rime-logger' will be available,

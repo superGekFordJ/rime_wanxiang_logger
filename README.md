@@ -36,10 +36,28 @@ The installer provides a single command-line tool, `rime-logger`, to manage the 
 
 ### To Install the Logger
 
-This will copy the Lua scripts to your Rime user directory and modify the `wanxiang.schema.yaml` to enable the logger.
+This command now starts an interactive session, allowing you to choose a logging preset directly from the command line.
 
 ```bash
 rime-logger install
+```
+
+You will be prompted to select a mode like "Normal", "Developer", or "Advanced".
+
+### To Analyze Your Typing Habits
+
+The `analyze` command reads your log file and provides a statistical summary of your typing accuracy, including first-choice accuracy, top-3 accuracy, and an overall prediction score.
+
+```bash
+rime-logger analyze
+```
+
+### To Export Data for Developers
+
+If you want to help improve the input schema, you can use the `export-misses` command. It creates a `rime_mispredictions_report.csv` file in your home directory, containing all instances where you didn't choose the first candidate. This file can be easily shared with developers.
+
+```bash
+rime-logger export-misses
 ```
 
 ### To Uninstall the Logger

@@ -37,7 +37,8 @@ local presets = {
         log_fields = {
             text_committed = {
                 selected_candidate_rank = true, -- Essential for accuracy
-                committed_text = true
+                committed_text = true,
+                source_first_candidate = true
             }
         }
     },
@@ -49,6 +50,9 @@ local presets = {
     developer = {
         enabled = true,
         log_only_non_first_choice = true,
+        -- You can override the log file path here.
+        -- Example: log_file_path = "C:\\Users\\YourUser\\Desktop\\rime_log.jsonl"
+        log_file_path = nil,
         log_events = {
             session_start = true,
             session_end = true,
@@ -83,6 +87,9 @@ local presets = {
     advanced = {
         enabled = true,
         log_only_non_first_choice = false,
+        -- You can override the log file path here.
+        -- Example: log_file_path = "C:\\Users\\YourUser\\Desktop\\rime_log.jsonl"
+        log_file_path = nil,
         log_events = {
             session_start = true,
             session_end = true,
@@ -120,7 +127,7 @@ local presets = {
         -- Master switch. If set to false, no logging will occur at all.
         enabled = true,
 
-        -- (Placeholder) In the future, you can override the log file path here.
+        -- You can override the log file path here.
         -- Example: log_file_path = "C:\\Users\\YourUser\\Desktop\\rime_log.jsonl"
         log_file_path = nil,
 

@@ -113,12 +113,12 @@ local function get_log_file_path()
         return config.log_file_path
     end
     if os.getenv("OS") == "Windows_NT" then
-        return os.getenv("APPDATA") .. "\\Rime\\input_habit_log.jsonl"
+        return os.getenv("APPDATA") .. "\\Rime\\input_habit_log_structured.jsonl"
     end
     if os.execute("test -d '" .. (os.getenv("HOME") or "") .. "/Library/Rime'") == 0 then
-        return (os.getenv("HOME") or "") .. "/Library/Rime/input_habit_log.jsonl"
+        return (os.getenv("HOME") or "") .. "/Library/Rime/input_habit_log_structured.jsonl"
     end
-    return (os.getenv("HOME") or "") .. "/.config/rime/input_habit_log.jsonl"
+    return (os.getenv("HOME") or "") .. "/.config/rime/input_habit_log_structured.jsonl"
 end
 
 local log_file_path = get_log_file_path()
