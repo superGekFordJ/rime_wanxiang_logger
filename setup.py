@@ -8,13 +8,13 @@ def read(fname):
 setup(
     name="rime-wanxiang-logger",
     version="0.1.0",
-    author="Your Name", # Replace with your name
-    author_email="your_email@example.com", # Replace with your email
+    author="superGekFordJ", # Replace with your name
+    author_email="hi@fordj.me", # Replace with your email
     description="A tool to install and manage a data logger for the Rime input method engine.",
     long_description=read('README.md'),
     long_description_content_type="text/markdown",
-    url="https://github.com/your_username/rime-wanxiang-logger", # Replace with your repository URL
-    license="MIT",
+    url="https://github.com/superGekFordJ/rime_wanxiang_logger.git", # Replace with your repository URL
+    license="GPL-3.0",
     packages=find_packages(),
     # This is the crucial part to ensure your .lua files are included in the package.
     # It tells setuptools that for the 'rime_logger' package, it should include
@@ -38,7 +38,7 @@ setup(
     },
     classifiers=[
         "Development Status :: 4 - Beta",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX :: Linux",

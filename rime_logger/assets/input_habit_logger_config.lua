@@ -1,28 +1,27 @@
--- Rime Input Habit Logger Configuration (Version 3.1 - Self-Contained Presets)
+-- Rime 输入习惯记录器配置 (版本 3.1 - 内置预设)
 
 --[[-----------------------------------------------------------------------
--- PRESET SELECTION
+-- 预设选择
 ---------------------------------------------------------------------------]]
--- Set your desired logging level here. The script will use the settings
--- from the matching preset defined below.
+-- 在此设置您想要的日志记录级别。脚本将使用下面定义的匹配预设中的设置。
 --
--- Available options:
--- "normal"    - Minimal logging for calculating basic typing accuracy.
--- "developer" - Good for debugging; focuses on non-first-choice commits.
--- "advanced"  - Logs almost everything for deep analysis.
--- "custom"    - A fully editable preset for your own settings.
+-- 可用选项:
+-- "normal"    - 最小化日志记录，用于计算基本的输入准确率。
+-- "developer" - 适合调试；专注于记录非首选上屏。
+-- "advanced"  - 记录几乎所有信息，用于深度分析。
+-- "custom"    - 完全可编辑的预设，用于您自己的设置。
 --
 local preset_choice = "normal"
 
 --[[-----------------------------------------------------------------------
--- PRESET DEFINITIONS
+-- 预设定义
 ---------------------------------------------------------------------------]]
--- The configurations for the presets selected above.
--- To make changes, edit the "custom" preset below and set preset_choice = "custom".
+-- 上面所选预设的配置。
+-- 如需更改，请编辑下面的 "custom" 预设，并将 preset_choice 设置为 "custom"。
 local presets = {
     -- ==================================================================
-    -- PRESET: NORMAL
-    -- Minimal logging for calculating basic predicting accuracy.
+    -- 预设: NORMAL
+    -- 最小化日志记录，用于计算基本的预测准确率。
     -- ==================================================================
     normal = {
         enabled = true,
@@ -31,12 +30,12 @@ local presets = {
             session_start = true,
             session_end = true,
             text_committed = true,
-            input_state_changed = false, --disable to prevent too much noise
+            input_state_changed = false, -- 禁用以防止过多的日志信息
             error = true
         },
         log_fields = {
             text_committed = {
-                selected_candidate_rank = true, -- Essential for accuracy
+                selected_candidate_rank = true, -- 对计算准确率至关重要
                 committed_text = true,
                 source_first_candidate = true
             }
@@ -44,14 +43,14 @@ local presets = {
     },
 
     -- ==================================================================
-    -- PRESET: DEVELOPER
-    -- Good for debugging. Focuses on non-first-choice selections.
+    -- 预设: DEVELOPER
+    -- 适合调试。专注于记录非首选上屏。
     -- ==================================================================
     developer = {
         enabled = true,
         log_only_non_first_choice = true,
-        -- You can override the log file path here.
-        -- Example: log_file_path = "C:\\Users\\YourUser\\Desktop\\rime_log.jsonl"
+        -- 您可以在此覆盖日志文件路径。
+        -- 示例: log_file_path = "C:\\Users\\YourUser\\Desktop\\rime_log.jsonl"
         log_file_path = nil,
         log_events = {
             session_start = true,
@@ -81,14 +80,14 @@ local presets = {
     },
 
     -- ==================================================================
-    -- PRESET: ADVANCED
-    -- Logs almost everything for deep analysis.
+    -- 预设: ADVANCED
+    -- 记录几乎所有信息，用于深度分析。
     -- ==================================================================
     advanced = {
         enabled = true,
         log_only_non_first_choice = false,
-        -- You can override the log file path here.
-        -- Example: log_file_path = "C:\\Users\\YourUser\\Desktop\\rime_log.jsonl"
+        -- 您可以在此覆盖日志文件路径。
+        -- 示例: log_file_path = "C:\\Users\\YourUser\\Desktop\\rime_log.jsonl"
         log_file_path = nil,
         log_events = {
             session_start = true,
@@ -118,41 +117,41 @@ local presets = {
     },
 
     -- ==================================================================
-    -- PRESET: CUSTOM
-    -- This section is for your personal configuration.
-    -- The original comments are preserved here to help you understand each setting.
-    -- To use these settings, set 'preset_choice' at the top of the file to "custom".
+    -- 预设: CUSTOM
+    -- 此部分用于您的个人配置。
+    -- 这里保留了原始注释，以帮助您理解每个设置。
+    -- 要使用这些设置，请将文件顶部的 'preset_choice' 设置为 "custom"。
     -- ==================================================================
     custom = {
-        -- Master switch. If set to false, no logging will occur at all.
+        -- 总开关。如果设置为 false，将完全不进行任何日志记录。
         enabled = true,
 
-        -- You can override the log file path here.
-        -- Example: log_file_path = "C:\\Users\\YourUser\\Desktop\\rime_log.jsonl"
+        -- 您可以在此覆盖日志文件路径。
+        -- 示例: log_file_path = "C:\\Users\\YourUser\\Desktop\\rime_log.jsonl"
         log_file_path = nil,
 
-        -- If true, only log commits where the selected candidate was NOT the first one offered.
-        -- This is useful for focusing on prediction errors or manual selections.
+        -- 如果为 true，则仅记录所选候选项不是首选的提交。
+        -- 这对于专注于预测错误或手动选择非常有用。
         log_only_non_first_choice = false,
 
-        -- Granular control over which event types to log.
-        -- This is useful for reducing log file size or for privacy.
+        -- 精细控制要记录的事件类型。
+        -- 这对于减小日志文件大小或保护隐私非常有用。
         log_events = {
             session_start = true,
             session_end = true,
             text_committed = true,
-            -- NOTE: 'input_state_changed' is very verbose. It logs every keypress
-            -- that changes the input buffer. Disable this if you only care about
-            -- the final committed text.
+            -- 注意: 'input_state_changed' 非常详细。它会记录每一次按键
+            -- 导致输入缓冲区变化的事件。如果您只关心最终上屏的文本，
+            -- 请禁用此项。
             input_state_changed = false,
             error = true
         },
 
-        -- Advanced control over which fields are logged for each event type.
-        -- This gives you maximum control over privacy and data granularity.
+        -- 对每种事件类型记录哪些字段进行高级控制。
+        -- 这使您可以最大程度地控制隐私和数据粒度。
         log_fields = {
             text_committed = {
-                -- For example, to stop logging the exact text you type, set:
+                -- 例如，要停止记录您输入的确切字符，请设置：
                 --   committed_text = false,
                 committed_text = true,
                 input_sequence_at_commit = true,
@@ -160,7 +159,7 @@ local presets = {
                 selected_candidate_rank = true,
                 source_input_buffer = true,
                 source_first_candidate = true,
-                -- To stop logging the list of candidates you saw, set:
+                -- 要停止记录您看到的候选词列表，请设置：
                 --   source_candidates_list = false,
                 source_candidates_list = true,
             },
@@ -175,6 +174,6 @@ local presets = {
     }
 }
 
--- This line selects the chosen preset table and returns it to the main script.
--- If the choice is invalid, it safely defaults to the "custom" preset.
+-- 此行选择所选的预设表并将其返回给主脚本。
+-- 如果选择无效，它将安全地默认为 "custom" 预设。
 return presets[preset_choice] or presets.custom
