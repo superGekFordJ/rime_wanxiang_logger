@@ -19,7 +19,7 @@
 
 1.  克隆此仓库或下载源代码:
     ```bash
-    git clone https://github.com/your-username/rime-wanxiang-logger.git
+    git clone https://github.com/superGekFordJ/rime_wanxiang_logger.git
     cd rime-wanxiang-logger
     ```
 
@@ -121,6 +121,5 @@ print(df.info())
 
 ## 许可证
 
-本项目采用 MIT 许可证。有关详细信息，请参阅 `LICENSE` 文件。
-```
-</output>
+本项目采用 GPL-3.0 许可证。有关详细信息，请参阅 `LICENSE` 文件。
+
