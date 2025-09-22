@@ -23,9 +23,13 @@
     cd rime-wanxiang-logger
     ```
 
-2.  使用 pip 安装此软件包。这将安装必要的文件并使 `rime-logger` 命令在系统范围内可用。
+2.  使用 `uv` 或者 `pipx` 安装此软件包。这将安装必要的文件并使 `rime-logger` 命令在系统范围内可用。
     ```bash
-    pip install .
+    # 本项目推荐使用uv安装
+    uv tool install .
+
+    # 使用pipx安装以避免污染全局环境，如果没有安装pipx可以运行 `pip install pipx`
+    pipx install .
     ```
 
 ## 使用方法
@@ -122,4 +126,3 @@ print(df.info())
 ## 许可证
 
 本项目采用 GPL-3.0 许可证。有关详细信息，请参阅 `LICENSE` 文件。
-
