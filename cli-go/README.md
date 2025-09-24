@@ -28,6 +28,8 @@ cli-go/
 │   │   ├── assets.go          # 使用 go:embed 指令加载 Lua 脚本
 │   │   ├── input_habit_logger.lua
 │   │   └── input_habit_logger_config.lua
+│   └── ui/                    # CLI 输出样式与展示工具
+│       └── ui.go              # 彩色标题、状态徽章、键值表等输出辅助
 │   └── analyzer/              # 数据分析逻辑
 │       └── analyzer.go        # JSONL 解析和统计分析功能
 └── rime-logger-go.exe         # (构建产物) 最终的可执行文件
@@ -71,7 +73,13 @@ cli-go/
   - **`PerformAnalysis()`**: 实现了与 Python 版本完全相同的统计分析逻辑。它迭代处理 `LogEvent` 切片，计算所有核心指标，包括“综合预测得分”。
   - **`ExportMisses()`**: 筛选出所有 `selected_candidate_rank > 0` 的误预测事件，并使用 `encoding/csv` 包将它们写入 CSV 文件。报告的列名和排序逻辑（按错误频率降序）也与原版保持一致。
 
-### 4. **`internal/assets` 包：内嵌资源**
+### 4. **`internal/ui` 包：统一的 CLI 输出风格**
+
+- 提供 `Section()`、`Subsection()`、`Successf()`、`Warnf()` 等辅助函数，为所有命令提供一致的彩色标题、状态徽章和对齐的键值展示。
+- 基于 `github.com/fatih/color` 和标准库 `text/tabwriter`，无需额外前端依赖即可呈现层次清晰的命令输出。
+- 当前 `install`、`uninstall`、`status`、`analyze`、`export-misses` 均使用该包输出信息，使用户能更快速地理解执行进度与结果。
+
+### 5. **`internal/assets` 包：内嵌资源**
 
 - **`assets.go`**:
   - 使用 Go 1.16+ 的 `//go:embed` 指令。
@@ -94,7 +102,12 @@ Go 版本的工作流程与 Python 版本基本相同，但底层实现更高效
     - `RimeManager` 解析 `config.lua` 找到日志文件路径。
     - `analyzer.ReadLogFile` 流式读取并解析 JSONL 数据到 `[]LogEvent`。
     - `analyzer.PerformAnalysis` 计算所有指标。
-    - 在终端打印格式化的结果。
+    - 借助 `internal/ui` 输出对齐的键值表和提示信息，阅读体验更佳。
+
+3.  **卸载 (`rime-logger-go uninstall`)**:
+    - 删除记录器 Lua 脚本，并在需要时交互式确认是否移除配置文件。
+    - 调用 `RimeManager.RevertSchemaForUninstall()` 恢复 schema 配置。
+    - 使用 `internal/ui` 的分步骤提示提醒用户最终需要重新部署 Rime。
 
 ## 关键设计决策与优势
 

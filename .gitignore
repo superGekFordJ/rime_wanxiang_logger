@@ -11,8 +11,8 @@ Thumbs.db
 
 # Build artifacts
 /build/
-/dist/
-/out/
+*/dist/
+*/out/
 
 # Logs
 /logs/
@@ -92,3 +92,4 @@ yarn-error.log*
 # Misc
 .env
 .env.* 
+cli-go/build.ps1

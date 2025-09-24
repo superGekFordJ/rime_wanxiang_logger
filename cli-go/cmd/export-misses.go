@@ -6,6 +6,7 @@ import (
 
 	"rime-wanxiang-logger-go/internal/analyzer"
 	"rime-wanxiang-logger-go/internal/manager"
+	"rime-wanxiang-logger-go/internal/ui"
 
 	"github.com/spf13/cobra"
 )
@@ -17,7 +18,7 @@ var exportMissesCmd = &cobra.Command{
 selected candidate was not the first one predicted by Rime. It then generates
 a CSV report of these mispredictions.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("--- 导出预测错误报告 ---")
+		ui.Section("导出预测错误报告")
 
 		// Initialize RimeManager to get proper log file path
 		rimeManager, err := manager.NewRimeManager()
@@ -39,7 +40,7 @@ a CSV report of these mispredictions.`,
 		// Get output path from flags or use default
 		outFilePath, _ := cmd.Flags().GetString("output")
 
-		fmt.Printf("📖 正在读取日志文件: %s\n", logFilePath)
+		ui.Infof("正在读取日志文件: %s", logFilePath)
 
 		// Read and parse the log file
 		events, err := analyzer.ReadLogFile(logFilePath)
@@ -48,7 +49,7 @@ a CSV report of these mispredictions.`,
 		}
 
 		if len(events) == 0 {
-			fmt.Println("⚠️  日志文件中未找到 'text_committed' 事件。")
+			ui.Warnf("日志文件中未找到 'text_committed' 事件。")
 			return nil
 		}
 
@@ -61,21 +62,21 @@ a CSV report of these mispredictions.`,
 		}
 
 		if missCount == 0 {
-			fmt.Println("✅ 太好了！未发现预测错误。您的输入法表现完美！")
+			ui.Successf("太好了！未发现预测错误。您的输入法表现完美！")
 			return nil
 		}
 
-		fmt.Printf("📊 在 %d 次总提交中发现 %d 次预测错误\n", len(events), missCount)
-		fmt.Printf("💾 正在导出到: %s\n", outFilePath)
+		ui.Infof("在 %d 次总提交中发现 %d 次预测错误", len(events), missCount)
+		ui.Infof("正在导出到: %s", outFilePath)
 
 		// Export mispredictions to CSV
 		if err := analyzer.ExportMisses(events, outFilePath); err != nil {
 			return fmt.Errorf("failed to export mispredictions: %w", err)
 		}
 
-		fmt.Printf("✅ 成功导出 %d 条预测错误记录到 '%s'\n", missCount, outFilePath)
-		fmt.Println("💡 您可以打开此 CSV 文件来查看具体的预测失误案例。")
-		fmt.Println("📈 最常见的错误会显示在文件顶部。")
+		ui.Successf("成功导出 %d 条预测错误记录到 '%s'", missCount, outFilePath)
+		ui.Infof("您可以打开此 CSV 文件来查看具体的预测失误案例。")
+		ui.Infof("最常见的错误会显示在文件顶部。")
 
 		return nil
 	},

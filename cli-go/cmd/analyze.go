@@ -5,6 +5,7 @@ import (
 
 	"rime-wanxiang-logger-go/internal/analyzer"
 	"rime-wanxiang-logger-go/internal/manager"
+	"rime-wanxiang-logger-go/internal/ui"
 
 	"github.com/spf13/cobra"
 )
@@ -16,7 +17,7 @@ var analyzeCmd = &cobra.Command{
 	Long: `This command reads the JSONL log file, calculates various metrics such as
 prediction accuracy (first choice hit rate, top-3 hit rate), and displays the results.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("--- 输入习惯分析 ---")
+		ui.Section("输入习惯分析")
 
 		// Initialize RimeManager to get the correct log file path
 		rimeManager, err := manager.NewRimeManager()
@@ -32,20 +33,20 @@ prediction accuracy (first choice hit rate, top-3 hit rate), and displays the re
 
 		// Check if log file exists
 		if !rimeManager.LogFileExists() {
-			fmt.Printf("❌ 未找到日志文件: %s\n", logFilePath)
+			ui.Errorf("未找到日志文件: %s", logFilePath)
 			return nil
 		}
 
-		fmt.Printf("📊 正在分析日志文件: %s\n", logFilePath)
+		ui.Infof("正在分析日志文件: %s", logFilePath)
 
 		// Read and parse the log file
 		events, err := analyzer.ReadLogFile(logFilePath)
 		if err != nil {
-			return fmt.Errorf("❌ 分析过程中发生错误: %w", err)
+			return fmt.Errorf("分析过程中发生错误: %w", err)
 		}
 
 		if len(events) == 0 {
-			fmt.Println("日志文件中未找到 'text_committed' 事件。")
+			ui.Warnf("日志文件中未找到 'text_committed' 事件。")
 			return nil
 		}
 
@@ -53,23 +54,25 @@ prediction accuracy (first choice hit rate, top-3 hit rate), and displays the re
 		results := analyzer.PerformAnalysis(events)
 
 		// Display prediction accuracy metrics
-		fmt.Println("\n## 预测准确度指标")
+		ui.Subsection("预测准确度指标")
 
 		if !results.HasValidSelections {
-			fmt.Println("未找到可供分析的有效候选词选择。")
+			ui.Warnf("未找到可供分析的有效候选词选择。")
 		} else {
-			fmt.Printf("  - 总候选词选择数: %d\n", results.TotalSelections)
-			fmt.Printf("  - 首选命中率:      %.2f%%\n", results.FirstChoiceHitRate)
-			fmt.Printf("  - 前三候选命中率:   %.2f%%\n", results.Top3HitRate)
-			fmt.Printf("  - 平均选择排名:     %.2f\n", results.AverageRank)
-			fmt.Printf("  - 综合预测得分:   %.3f / 1.000\n", results.OverallAccuracyScore)
+			ui.PrintKV([][2]string{
+				{"总候选词选择数", fmt.Sprintf("%d", results.TotalSelections)},
+				{"首选命中率", fmt.Sprintf("%.2f%%", results.FirstChoiceHitRate)},
+				{"前三候选命中率", fmt.Sprintf("%.2f%%", results.Top3HitRate)},
+				{"平均选择排名", fmt.Sprintf("%.2f", results.AverageRank)},
+				{"综合预测得分", fmt.Sprintf("%.3f / 1.000", results.OverallAccuracyScore)},
+			})
 		}
 
 		// Display general statistics
-		fmt.Println("\n## 常规统计")
-		fmt.Printf("  - 总上屏次数 (包括直接上屏): %d\n", results.TotalCommits)
+		ui.Subsection("常规统计")
+		ui.PrintKV([][2]string{{"总上屏次数 (包括直接上屏)", fmt.Sprintf("%d", results.TotalCommits)}})
 		if results.TotalCommits > 0 {
-			fmt.Printf("  - 直接上屏率 (非候选词): %.2f%%\n", results.DirectInputRate)
+			ui.PrintKV([][2]string{{"直接上屏率 (非候选词)", fmt.Sprintf("%.2f%%", results.DirectInputRate)}})
 		}
 
 		return nil
